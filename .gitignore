@@ -1,4 +1,2 @@
-config.linux-3.x
-!config.arch
-!etc/init.d
-!etc/udev/rules.d
+*.o
+opencv_sample/sample_convert

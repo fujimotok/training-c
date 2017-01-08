@@ -161,6 +161,7 @@ romfs:
 
 	$(ROMFSINST) /etc
 	$(ROMFSINST) /home
+	$(ROMFSINST) /lib
 	$(ROMFSINST) /usr
 
 	$(ROMFSINST) ../../Generic/romfs/etc/services /etc/services

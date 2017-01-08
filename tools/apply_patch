@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+cd `dirname $0`
+
+CONFIG_CONFIG=../../../../config/.config
+. "$CONFIG_CONFIG"
+
+if [ _"$CONFIG_USER_HOSTAP_WPA_SUPPLICANT" = _y ]; then
+  # See: http://armadillo.atmark-techno.com/howto/a800-ieee80211ac-gw-900d#step1-3
+
+  WPA_SUPPLICANT_CONFIG=../../../../user/hostap/wpa_supplicant/.config
+
+  sed -i "${WPA_SUPPLICANT_CONFIG}" \
+      -e 's!^\(CONFIG_DRIVER_MADWIFI=y\)!#\1!' \
+      -e 's!^\(CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/wireless/madwifi\)!#\1!'
+fi

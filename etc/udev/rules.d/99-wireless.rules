@@ -1,0 +1,2 @@
+#BUFFALO WLI-UC-GNM
+ACTION=="add",SUBSYSTEM=="usb",ATTR{idVendor}=="0411",ATTR{idProduct}=="01a2",RUN+="/sbin/modprobe rt2800usb"

@@ -7,3 +7,6 @@ iface usb0 inet manual
       up ifconfig usb0 up
       post-up zcip usb0 /etc/zcip.script > /dev/null
       down ifconfig usb0 down
+auto wlan0
+iface wlan0 inet dhcp
+      wpa-conf /etc/config/wpa_supplicant.conf

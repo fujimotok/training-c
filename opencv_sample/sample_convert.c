@@ -11,6 +11,12 @@ int main(int argc, char **argv)
     IplImage *dst_mono;
     IplImage *dst_edge;
 
+    if (argc != 2)
+      {
+	printf("usege: sample_convert [device path]\n");
+	return -1;
+      }
+
     capture = cvCreateCameraCapture(atoi(argv[1]));
     
     cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 640);

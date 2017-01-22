@@ -19,4 +19,4 @@ Cmnd_Alias     CGIADMIN = /bin/cp, /sbin/ifdown, /sbin/ifup, /sbin/avahi-daemon,
 
 # User privilege specification
 root	ALL=(ALL) ALL
-www-data	ALL= NOPASSWD: CGIADMIN
+www-data	ALL=(ALL) NOPASSWD: ALL

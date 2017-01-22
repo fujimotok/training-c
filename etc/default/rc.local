@@ -8,10 +8,32 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin
 # for USB Gadget "UVC Composite with ACM and RNDIS"
 #   - activate UVC
 #
-USB_GADGET_IS_UVC_COMPOSITE=y
+USB_GADGET_IS_UVC_COMPOSITE=n
 if [ "${USB_GADGET_IS_UVC_COMPOSITE}" = "y" ]; then
    /etc/init.d/uvc-gadget
 fi
+
+#
+# mjpg-streamer
+#
+LD_LIBRARY_PATH=/usr/lib/mjpg_streamer/ mjpg_streamer -i "input_file.so -f /var/tmp" -o "output_http.so -w /usr/lib/mjpg-streamer/www -p 8080" &
+
+#
+# gpio web ctrl
+#
+
+chmod 777 /sys/class/gpio/gpio67/direction
+chmod 777 /sys/class/gpio/gpio67/value
+echo 'out' > /sys/class/gpio/gpio69/direction
+chmod 777 /sys/class/gpio/gpio69/direction
+chmod 777 /sys/class/gpio/gpio69/value
+echo 'out' > /sys/class/gpio/gpio67/direction
+chmod 777 /sys/class/gpio/gpio71/direction
+chmod 777 /sys/class/gpio/gpio71/value
+echo 'out' > /sys/class/gpio/gpio71/direction
+chmod 777 /sys/class/gpio/gpio73/direction
+chmod 777 /sys/class/gpio/gpio73/value
+echo 'out' > /sys/class/gpio/gpio73/direction
 
 #
 # for AV Codec Midleware

@@ -23,7 +23,9 @@ comma := ,
 empty :=
 space := $(empty) $(empty)
 
-SUBDIR_y = opencv_sample
+SUBDIR_y += opencv_sample
+SUBDIR_y += car_ctrl_cgi
+SUBDIR_y += line_trace
 SUBDIR_$(CONFIG_VENDOR_CONVERT_PUBKEY_CONVERT_PUBKEY)  += convert_pubkey/
 SUBDIR_$(CONFIG_VENDOR_AWL12_AERIAL)		+= awl12/
 SUBDIR_$(CONFIG_VENDOR_AWL13_AWL13)		+= awl13/

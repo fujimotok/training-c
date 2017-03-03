@@ -1,26 +1,67 @@
 #include "opencv2/opencv.hpp"
 #include <fstream>
 #include <stdlib.h>
+#include <signal.h>
 
 int g_is_inv = 0;
+int (*g_logic)(cv::Mat&);
 
-void stop_car (void) 
+/*
+ * 7 8 9     ^
+ * 4 5 6 = < N >
+ * 1 2 3     v
+ */
+enum MOVE_DIRECTION {
+  MOVE_BACK   = 2,
+  MOVE_LEFT   = 4,
+  MOVE_STOP   = 5,
+  MOVE_RIGHT  = 6,
+  MOVE_FOWARD = 8,
+};
+
+void move_car (int direction)
 {
-  std::ofstream l_front("/sys/class/gpio/gpio67/value");
-  l_front << "0" << std::endl;
-  std::ofstream l_back("/sys/class/gpio/gpio69/value");
-  l_back << "0"<< std::endl;
-  std::ofstream r_front("/sys/class/gpio/gpio71/value");
-  r_front << "0" << std::endl;
-  std::ofstream r_back("/sys/class/gpio/gpio73/value");
-  r_back << "0"<< std::endl;
+  int is_l_forard = 0;
+  int is_l_back   = 0;
+  int is_r_forard = 0;
+  int is_r_back   = 0;
+
+  switch (direction)
+    {
+    case MOVE_BACK:
+      is_l_back   = 1;
+      is_r_back   = 1;
+      break;
+    case MOVE_LEFT:
+      is_l_forard = 1;
+      //is_r_back   = 1;
+      break;
+    case MOVE_RIGHT:
+      is_r_forard = 1;
+      //is_l_back   = 1;
+      break;
+    case MOVE_FOWARD:
+      is_l_forard = 1;
+      is_r_forard = 1;
+      break;
+    case MOVE_STOP:
+    default:
+      break;
+    }
+
+  std::ofstream l_forard ("/sys/class/gpio/gpio67/value");
+  std::ofstream l_back   ("/sys/class/gpio/gpio69/value");
+  std::ofstream r_forard ("/sys/class/gpio/gpio71/value");
+  std::ofstream r_back   ("/sys/class/gpio/gpio73/value");
+
+  l_forard << is_l_forard << std::endl;
+  l_back   << is_l_back   << std::endl;
+  r_forard << is_r_forard << std::endl;
+  r_back   << is_r_back   << std::endl;
 }
 
-void main_loop (cv::VideoCapture &cap)
+int raster_scan (cv::Mat &frame)
 {
-  cv::Mat frame;
-  cap >> frame; // get a new frame from camera
-
   cv::Mat gray_img;
   cv::Mat bin_img; 
   cv::cvtColor(frame, gray_img, CV_BGR2GRAY);
@@ -55,37 +96,37 @@ void main_loop (cv::VideoCapture &cap)
     }
   int center_px = start_px + cnt_max / 2;
 
+  cv::circle(frame, cv::Point(center_px ,bin_img.size().height/4), 20, cv::Scalar(0,0,255), 3, 4);
+
   if (center_px > bin_img.size().width/2)
     {
-      std::ofstream l_front("/sys/class/gpio/gpio67/value");
-      l_front << "1" << std::endl;
-      std::ofstream l_back("/sys/class/gpio/gpio69/value");
-      l_back << "0"<< std::endl;
-      std::ofstream r_front("/sys/class/gpio/gpio71/value");
-      r_front << "0" << std::endl;
-      std::ofstream r_back("/sys/class/gpio/gpio73/value");
-      r_back << "0"<< std::endl;
+      return MOVE_LEFT;
     }
   else
     {
-      std::ofstream l_front("/sys/class/gpio/gpio67/value");
-      l_front << "0" << std::endl;
-      std::ofstream l_back("/sys/class/gpio/gpio69/value");
-      l_back << "0"<< std::endl;
-      std::ofstream r_front("/sys/class/gpio/gpio71/value");
-      r_front << "1" << std::endl;
-      std::ofstream r_back("/sys/class/gpio/gpio73/value");
-      r_back << "0"<< std::endl;
+      return MOVE_RIGHT;
     }
+}
 
-  cv::circle(frame, cv::Point(center_px ,bin_img.size().height/4), 20, cv::Scalar(0,0,255), 3, 4);
+void main_loop (cv::VideoCapture &cap)
+{
+  cv::Mat frame;
+  cap >> frame; // get a new frame from camera
+
+  move_car(g_logic(frame));
 
   cv::imwrite("/var/tmp/img.jpg", frame);
 }
 
 int main(int argc, char* argv[])
 {
-  atexit(stop_car);
+  signal(SIGTERM,
+	 [](int signum){
+	   move_car(MOVE_STOP);
+	   exit(signum);
+	 });
+
+  g_logic = raster_scan;
 
   if ((argc == 2) && (argv[1][0] = '1'))
     {

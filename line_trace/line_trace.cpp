@@ -96,15 +96,20 @@ int raster_scan (cv::Mat &frame)
     }
   int center_px = start_px + cnt_max / 2;
 
+  //frame = bin_img;
   cv::circle(frame, cv::Point(center_px ,bin_img.size().height/4), 20, cv::Scalar(0,0,255), 3, 4);
 
-  if (center_px > bin_img.size().width/2)
+  if (center_px > 0 && center_px < bin_img.size().width * 3 / 8)
+    {
+      return MOVE_RIGHT;
+    }
+  else if (center_px > bin_img.size().width * 5 / 8)
     {
       return MOVE_LEFT;
     }
   else
     {
-      return MOVE_RIGHT;
+      return MOVE_FOWARD;
     }
 }
 
